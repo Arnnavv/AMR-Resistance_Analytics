@@ -1,5 +1,5 @@
 """
-ResistAI — AMR Intelligence Platform
+StrataMed Analytics — AMR Intelligence Platform
 =====================================
 src/analysis.py
 
@@ -8,7 +8,7 @@ All functions return either DataFrames (for tables) or Plotly figures
 (for visualisations), making them usable in both the notebook and the
 Streamlit dashboard without duplication.
 
-Author: ResistAI Analytics
+Author: StrataMed Analytics Analytics
 """
 
 import pandas as pd
@@ -19,7 +19,7 @@ from plotly.subplots import make_subplots
 
 
 # ── Colour palette ────────────────────────────────────────────────────────────
-# Clinical / professional colour scheme aligned with ResistAI brand
+# Clinical / professional colour scheme aligned with StrataMed Analytics brand
 COLORS = {
     "Susceptible":   "#2ecc71",   # green  — safe
     "Intermediate":  "#f39c12",   # amber  — caution
@@ -92,7 +92,7 @@ def meropenem_resistance_by_organism(df: pd.DataFrame) -> pd.DataFrame:
     """
     Resistance rate of Meropenem broken down by organism.
 
-    This is the core ResistAI metric: which bacteria are becoming
+    This is the core StrataMed Analytics metric: which bacteria are becoming
     resistant to our last-resort antibiotic?
 
     Returns DataFrame with organism, total tests, resistant count,
@@ -145,7 +145,7 @@ def fig_meropenem_susceptibility(df: pd.DataFrame) -> go.Figure:
     """
     Bar chart of Meropenem susceptibility breakdown.
 
-    The most important single chart for ResistAI:
+    The most important single chart for StrataMed Analytics:
     How often does Meropenem fail?
     """
     mero = df[(df["antibiotic"] == "MEROPENEM") & (df["susceptibility"].notna())]
@@ -215,7 +215,7 @@ def fig_resistance_trend(df: pd.DataFrame, antibiotic: str = "MEROPENEM") -> go.
     """
     Line chart of resistance rate over time (by year) for a given antibiotic.
 
-    This is the most critical diagnostic chart for ResistAI:
+    This is the most critical diagnostic chart for StrataMed Analytics:
     Is resistance increasing, stable, or declining?
     A rising trend = growing market urgency for Venus Remedies.
     """

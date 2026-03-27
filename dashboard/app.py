@@ -1,5 +1,5 @@
 """
-ResistAI — AMR Intelligence Platform
+StrataMed Analytics — AMR Intelligence Platform
 =====================================
 dashboard/app.py
 
@@ -9,7 +9,7 @@ Meropenem resistance patterns using the Stanford Healthcare ARMD dataset.
 Run with:
     streamlit run dashboard/app.py
 
-Author: ResistAI Analytics
+Author: StrataMed Analytics Analytics
 """
 
 import sys
@@ -40,7 +40,7 @@ from src.analysis import (
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="ResistAI — AMR Intelligence",
+    page_title="StrataMed Analytics — AMR Intelligence",
     page_icon="🧬",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -176,7 +176,7 @@ def get_resistance_data():
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## 🧬 ResistAI")
+    st.markdown("## 🧬 StrataMed Analytics")
     st.markdown("**AMR Intelligence Platform**")
     st.markdown("---")
     st.markdown("**Partner:** Venus Remedies Ltd.")
@@ -248,7 +248,7 @@ def apply_dark_theme(fig):
 # ══════════════════════════════════════════════════════════════════════════════
 if page == "🏠 Overview":
     st.markdown(
-        '<h1 style="color:#e74c3c;font-family:IBM Plex Mono,monospace;">🧬 ResistAI</h1>',
+        '<h1 style="color:#e74c3c;font-family:IBM Plex Mono,monospace;">🧬 StrataMed Analytics</h1>',
         unsafe_allow_html=True
     )
     st.markdown(
@@ -261,7 +261,7 @@ if page == "🏠 Overview":
     <div style="background:#1a1a2e;border-radius:12px;padding:20px 24px;margin:16px 0;
                 border:1px solid #e74c3c22;">
     <p style="color:#ecf0f1;font-size:1rem;line-height:1.8;">
-    <strong style="color:#e74c3c;">ResistAI</strong> is an AMR intelligence startup
+    <strong style="color:#e74c3c;">StrataMed Analytics</strong> is an AMR intelligence startup
     partnering with <strong>Venus Remedies Ltd.</strong> to combat the global antimicrobial
     resistance crisis. This dashboard analyzes real-world clinical EHR data from
     <strong>Stanford Healthcare</strong> to identify Meropenem resistance patterns,
@@ -354,7 +354,7 @@ elif page == "📂 Raw Data":
     st.download_button(
         "⬇️ Download filtered data (CSV)",
         data=filtered.to_csv(index=False),
-        file_name="resistai_filtered.csv",
+        file_name="StrataMed Analytics_filtered.csv",
         mime="text/csv"
     )
 
@@ -632,7 +632,7 @@ elif page == "🔍 Diagnostic Analysis":
 # ══════════════════════════════════════════════════════════════════════════════
 elif page == "💡 Business Insights":
     st.markdown('<h2 style="color:#e74c3c;">Business Intelligence Report</h2>', unsafe_allow_html=True)
-    st.markdown("**ResistAI → Venus Remedies Ltd. | Strategic AMR Intelligence**")
+    st.markdown("**StrataMed Analytics → Venus Remedies Ltd. | Strategic AMR Intelligence**")
 
     top3_orgs = meropenem_resistance_by_organism(master).head(3)
 
@@ -683,7 +683,7 @@ elif page == "💡 Business Insights":
             "title": "Group Phase — Predictive Extension",
             "body": "The patterns identified in this descriptive and diagnostic analysis "
                     "provide the feature set for predictive ML models (Classification, "
-                    "Clustering, Regression) in the group phase — enabling ResistAI to "
+                    "Clustering, Regression) in the group phase — enabling StrataMed Analytics to "
                     "forecast resistance risk at the patient level.",
         },
     ]
@@ -703,7 +703,7 @@ elif page == "💡 Business Insights":
     st.markdown("---")
     st.markdown(
         '<div style="text-align:center;color:#7f8c8d;font-size:0.8rem;">'
-        'ResistAI Analytics | Stanford Healthcare ARMD Dataset | '
+        'StrataMed Analytics Analytics | Stanford Healthcare ARMD Dataset | '
         'Nateghi Haredasht, F., et al. arXiv:2503.07664'
         '</div>',
         unsafe_allow_html=True

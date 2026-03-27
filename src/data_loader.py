@@ -1,5 +1,5 @@
 """
-ResistAI — AMR Intelligence Platform
+StrataMed Analytics — AMR Intelligence Platform
 =====================================
 src/data_loader.py
 
@@ -7,7 +7,7 @@ Handles loading and merging of all ARMD (Antibiotic Resistance Microbiology Data
 tables from Stanford Healthcare EHR data. Each function is documented with the
 clinical and business context of what it loads.
 
-Author: ResistAI Analytics
+Author: StrataMed Analytics Analytics
 Dataset: ARMD — Stanford Healthcare (Dryad, 2025)
 Citation: Nateghi Haredasht, F., et al. arXiv:2503.07664
 """
@@ -44,7 +44,7 @@ def load_cohort(path: str = None) -> pd.DataFrame:
         of antibiotics. The result for each antibiotic is S (Susceptible),
         I (Intermediate), or R (Resistant).
 
-    Business context (ResistAI):
+    Business context (StrataMed Analytics):
         Meropenem records where susceptibility = 'Resistant' are our primary
         signal — these are the cases where last-resort antibiotics are failing.
 
@@ -77,7 +77,7 @@ def load_demographics(path: str = None) -> pd.DataFrame:
     which gender — intentional de-identification by the dataset authors.
 
     Business context:
-        Allows ResistAI to segment resistance burden by patient age group,
+        Allows StrataMed Analytics to segment resistance burden by patient age group,
         critical for understanding which demographics face the highest AMR risk.
 
     Columns:
@@ -140,7 +140,7 @@ def load_microbial_resistance(path: str = None) -> pd.DataFrame:
 
     Business context:
         Patients with prior Meropenem resistance represent the highest-risk
-        segment — and a core focus for ResistAI's early warning system.
+        segment — and a core focus for StrataMed Analytics's early warning system.
 
     Columns:
         organism                       — Bacteria

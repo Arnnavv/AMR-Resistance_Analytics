@@ -1,5 +1,5 @@
 """
-ResistAI — AMR Intelligence Platform
+StrataMed Analytics — AMR Intelligence Platform
 =====================================
 src/cleaning.py
 
@@ -7,7 +7,7 @@ Data cleaning and transformation pipeline for the ARMD dataset.
 Every transformation is documented with the clinical and business
 rationale for making it.
 
-Author: ResistAI Analytics
+Author: StrataMed Analytics Analytics
 """
 
 import pandas as pd
@@ -70,7 +70,7 @@ def clean_master(df: pd.DataFrame, save: bool = True) -> pd.DataFrame:
         pd.DataFrame: Cleaned and feature-engineered dataset
     """
     print("━" * 55)
-    print("  ResistAI — Data Cleaning Pipeline")
+    print("  StrataMed Analytics — Data Cleaning Pipeline")
     print("━" * 55)
     original_shape = df.shape
 
@@ -197,7 +197,7 @@ def get_meropenem_df(df: pd.DataFrame) -> pd.DataFrame:
     """
     Filter the master dataset to Meropenem records only.
 
-    This is the primary analytical slice for ResistAI's core business question:
+    This is the primary analytical slice for StrataMed Analytics's core business question:
     'Where and in whom is Meropenem failing?'
 
     Args:

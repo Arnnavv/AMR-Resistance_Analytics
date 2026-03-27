@@ -1,4 +1,4 @@
-# 🧬 ResistAI — AMR Intelligence Platform
+# 🧬 StrataMed — AMR Intelligence Platform
 
 > **Antimicrobial Resistance Analytics for Venus Remedies Ltd.**  
 > Powered by Stanford Healthcare ARMD Dataset (1999–2024)
@@ -7,7 +7,7 @@
 
 ## Overview
 
-**ResistAI** is an AMR (Antimicrobial Resistance) intelligence platform built as an analytics partnership with **Venus Remedies Ltd.**, an Indian pharmaceutical company manufacturing Meropenem — a last-resort carbapenem antibiotic classified as essential medicine by the WHO.
+**StrataMed** is an AMR (Antimicrobial Resistance) intelligence platform built as an analytics partnership with **Venus Remedies Ltd.**, an Indian pharmaceutical company manufacturing Meropenem — a last-resort carbapenem antibiotic classified as essential medicine by the WHO.
 
 This project analyzes 25 years of real-world clinical EHR data from Stanford Healthcare to answer one core business question:
 
@@ -19,7 +19,7 @@ This project analyzes 25 years of real-world clinical EHR data from Stanford Hea
 
 Antimicrobial resistance (AMR) is one of the most critical global health crises. Bacteria are evolving to resist antibiotics faster than new drugs are developed. Meropenem, as a last-resort antibiotic, is increasingly being used inappropriately — accelerating resistance and threatening its effectiveness precisely when it is needed most.
 
-**ResistAI** helps Venus Remedies:
+**StrataMed** helps Venus Remedies:
 - Identify high-risk organisms and clinical settings driving Meropenem resistance
 - Understand resistance trends over 25 years to inform long-term strategy
 - Segment patient populations by AMR risk for stewardship program targeting
@@ -60,7 +60,7 @@ Nateghi Haredasht, F., et al. *Antibiotic Resistance Microbiology Dataset (ARMD)
 ## Project Structure
 
 ```
-resistai-amr-analytics/
+StrataMed-amr-analytics/
 │
 ├── data/
 │   ├── raw/                          ← Place downloaded ARMD CSV files here
@@ -96,8 +96,8 @@ resistai-amr-analytics/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/resistai-amr-analytics.git
-cd resistai-amr-analytics
+git clone https://github.com/yourusername/StrataMed-amr-analytics.git
+cd StrataMed-amr-analytics
 ```
 
 ### 2. Create virtual environment & install dependencies

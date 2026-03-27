@@ -1,4 +1,4 @@
-# ResistAI — AMR Intelligence Platform
+# StrataMed — AMR Intelligence Platform
 # Requirements
 # Install with: pip install -r requirements.txt
 

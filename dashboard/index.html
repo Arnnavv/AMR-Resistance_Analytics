@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ResistAI — AMR Intelligence Platform</title>
+<title>StrataMed Analytics — AMR Intelligence Platform</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -147,7 +147,7 @@
 <!-- ── Header ─────────────────────────────────────────────── -->
 <header>
   <div>
-    <div class="logo">🧬 ResistAI <span>AMR Intelligence Platform</span></div>
+    <div class="logo">🧬 StrataMed Analytics <span>AMR Intelligence Platform</span></div>
     <div style="margin-top:4px;font-size:0.8rem;color:var(--muted);">
       Partner: Venus Remedies Ltd. &nbsp;|&nbsp; Stanford Healthcare ARMD Dataset
     </div>
@@ -175,7 +175,7 @@
   <div class="hero">
     <h2 style="color:var(--accent);margin-bottom:12px;">AMR Intelligence Platform</h2>
     <p>
-      <strong>ResistAI</strong> is an AMR intelligence startup partnering with
+      <strong>StrataMed Analytics</strong> is an AMR intelligence startup partnering with
       <strong>Venus Remedies Ltd.</strong> to combat the global antimicrobial resistance crisis.
       This dashboard analyzes real-world clinical EHR data from <strong>Stanford Healthcare</strong>
       to identify Meropenem resistance patterns, high-risk patient profiles, and the organisms
@@ -370,7 +370,7 @@
 <div id="page-insights" class="page">
   <div class="section-h">Business Intelligence Report</div>
   <p style="color:var(--muted);margin-bottom:8px;font-size:0.9rem;">
-    ResistAI → Venus Remedies Ltd. | Strategic AMR Intelligence
+    StrataMed Analytics → Venus Remedies Ltd. | Strategic AMR Intelligence
   </p>
 
   <div id="findings-container">
@@ -402,12 +402,12 @@
     <div class="finding">
       <div class="finding-num">FINDING 06</div>
       <h4>Group Phase — Predictive Extension</h4>
-      <p>The patterns identified in this descriptive and diagnostic analysis provide the feature set for predictive ML models (Classification, Clustering, Regression) in the group phase — enabling ResistAI to forecast resistance risk at the patient level and guide proactive clinical intervention.</p>
+      <p>The patterns identified in this descriptive and diagnostic analysis provide the feature set for predictive ML models (Classification, Clustering, Regression) in the group phase — enabling StrataMed Analytics to forecast resistance risk at the patient level and guide proactive clinical intervention.</p>
     </div>
   </div>
 
   <footer style="margin-top:40px;border-top:1px solid var(--border);padding-top:20px;">
-    <p>ResistAI Analytics &nbsp;|&nbsp; Stanford Healthcare ARMD Dataset</p>
+    <p>StrataMed Analytics Analytics &nbsp;|&nbsp; Stanford Healthcare ARMD Dataset</p>
     <p style="margin-top:4px;">Citation: Nateghi Haredasht, F., et al. <em>ARMD.</em> Stanford Healthcare, 2025. arXiv:2503.07664</p>
   </footer>
 </div>
@@ -798,7 +798,7 @@ function renderInsights() {
   document.getElementById('f1-body').textContent =
     `${mero.length.toLocaleString()} Meropenem tests across ${patients.toLocaleString()} patients. ` +
     `Last-resort antibiotic resistance rate: ${rRate}%. This directly defines the urgency of ` +
-    `Venus Remedies' stewardship mission and the commercial opportunity for ResistAI's platform.`;
+    `Venus Remedies' stewardship mission and the commercial opportunity for StrataMed Analytics's platform.`;
 
   const orgResist={},orgTotal={};
   mero.forEach(r=>{

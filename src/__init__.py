@@ -1,1 +1,1 @@
-# ResistAI src package
+# StrataMed Analytics src package
