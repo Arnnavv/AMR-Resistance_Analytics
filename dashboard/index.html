@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ResistAI — AMR Intelligence Platform</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0f1117;
+    --surface:   #1a1a2e;
+    --surface2:  #16213e;
+    --accent:    #e74c3c;
+    --accent2:   #c0392b;
+    --green:     #2ecc71;
+    --amber:     #f39c12;
+    --text:      #ecf0f1;
+    --muted:     #95a5a6;
+    --border:    rgba(231,76,60,0.2);
+    --font-mono: 'IBM Plex Mono', monospace;
+    --font-sans: 'IBM Plex Sans', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); min-height: 100vh; }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo { font-family: var(--font-mono); font-size: 1.8rem; font-weight: 600; color: var(--accent); }
+  .logo span { color: var(--text); font-weight: 300; font-size: 1rem; margin-left: 12px; }
+  .badge {
+    background: rgba(231,76,60,0.1); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 14px; font-size: 0.75rem;
+    font-family: var(--font-mono); color: var(--muted);
+  }
+
+  /* ── Nav ── */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: 4px; padding: 8px 48px; overflow-x: auto;
+  }
+  nav button {
+    background: transparent; border: none; color: var(--muted);
+    font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600;
+    padding: 8px 16px; border-radius: 8px; cursor: pointer;
+    white-space: nowrap; transition: all 0.2s;
+  }
+  nav button:hover { background: rgba(231,76,60,0.1); color: var(--text); }
+  nav button.active { background: var(--accent); color: white; }
+
+  /* ── Layout ── */
+  main { max-width: 1400px; margin: 0 auto; padding: 32px 48px; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── Section header ── */
+  .section-h {
+    font-size: 1.3rem; font-weight: 700; color: var(--text);
+    border-left: 4px solid var(--accent); padding-left: 12px;
+    margin: 32px 0 20px;
+  }
+
+  /* ── KPI grid ── */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 24px 0; }
+  .kpi-card {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 24px; text-align: center;
+    box-shadow: 0 4px 20px rgba(231,76,60,0.08);
+  }
+  .kpi-val { font-family: var(--font-mono); font-size: 2rem; font-weight: 600; color: var(--accent); }
+  .kpi-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  /* ── Chart cards ── */
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 24px; }
+  .chart-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px;
+  }
+  .chart-card h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 16px; }
+  .chart-wrap { position: relative; height: 320px; }
+
+  /* ── Insight box ── */
+  .insight {
+    background: var(--surface); border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0; padding: 12px 16px;
+    margin: 8px 0 20px; font-size: 0.88rem; color: var(--muted); line-height: 1.7;
+  }
+  .insight strong { color: var(--text); }
+
+  /* ── Table ── */
+  .tbl-wrap { overflow-x: auto; margin: 16px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: var(--surface2); color: var(--muted); text-align: left; padding: 10px 14px;
+       font-weight: 600; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.5px; }
+  td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); }
+  tr:hover td { background: rgba(231,76,60,0.04); }
+
+  /* ── Upload zone ── */
+  .upload-zone {
+    border: 2px dashed var(--border); border-radius: 12px;
+    padding: 32px; text-align: center; color: var(--muted); cursor: pointer;
+    transition: all 0.2s; margin: 24px 0;
+  }
+  .upload-zone:hover { border-color: var(--accent); color: var(--text); }
+  .upload-zone input { display: none; }
+
+  /* ── Findings ── */
+  .finding {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px; margin: 12px 0;
+  }
+  .finding-num { font-family: var(--font-mono); color: var(--accent); font-size: 0.8rem; font-weight: 600; }
+  .finding h4 { color: var(--text); margin: 6px 0 8px; font-size: 1rem; }
+  .finding p { color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+
+  /* ── Hero intro ── */
+  .hero {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 28px 32px; margin: 0 0 32px;
+  }
+  .hero p { color: var(--muted); font-size: 0.95rem; line-height: 1.8; }
+  .hero p strong { color: var(--text); }
+
+  /* ── Status badges ── */
+  .tag-s { background: rgba(46,204,113,0.15); color: var(--green); border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; }
+  .tag-r { background: rgba(231,76,60,0.15); color: var(--accent); border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; }
+  .tag-i { background: rgba(243,156,18,0.15); color: var(--amber); border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; }
+
+  footer {
+    text-align: center; padding: 32px; color: var(--muted);
+    font-size: 0.78rem; border-top: 1px solid var(--border); margin-top: 64px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────── -->
+<header>
+  <div>
+    <div class="logo">🧬 ResistAI <span>AMR Intelligence Platform</span></div>
+    <div style="margin-top:4px;font-size:0.8rem;color:var(--muted);">
+      Partner: Venus Remedies Ltd. &nbsp;|&nbsp; Stanford Healthcare ARMD Dataset
+    </div>
+  </div>
+  <div class="badge">1999 – 2024 &nbsp;•&nbsp; 283K+ Patients</div>
+</header>
+
+<!-- ── Nav ────────────────────────────────────────────────── -->
+<nav>
+  <button class="active" onclick="showPage('overview')">🏠 Overview</button>
+  <button onclick="showPage('upload')">📂 Load Data</button>
+  <button onclick="showPage('descriptive')">📊 Descriptive</button>
+  <button onclick="showPage('meropenem')">🔬 Meropenem</button>
+  <button onclick="showPage('temporal')">📈 Trends</button>
+  <button onclick="showPage('diagnostic')">🔍 Diagnostic</button>
+  <button onclick="showPage('insights')">💡 Business Insights</button>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: OVERVIEW
+═══════════════════════════════════════════════════════════ -->
+<div id="page-overview" class="page active">
+  <div class="hero">
+    <h2 style="color:var(--accent);margin-bottom:12px;">AMR Intelligence Platform</h2>
+    <p>
+      <strong>ResistAI</strong> is an AMR intelligence startup partnering with
+      <strong>Venus Remedies Ltd.</strong> to combat the global antimicrobial resistance crisis.
+      This dashboard analyzes real-world clinical EHR data from <strong>Stanford Healthcare</strong>
+      to identify Meropenem resistance patterns, high-risk patient profiles, and the organisms
+      driving last-resort antibiotic failure.
+    </p>
+    <p style="margin-top:12px;">
+      <strong>Core Question:</strong> Which organisms, patient demographics, culture types,
+      and clinical settings are driving Meropenem resistance — and how has that resistance
+      evolved over 25 years?
+    </p>
+  </div>
+
+  <div class="kpi-grid" id="kpi-grid">
+    <div class="kpi-card"><div class="kpi-val" id="kpi-records">—</div><div class="kpi-label">Total Records</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-patients">—</div><div class="kpi-label">Unique Patients</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-organisms">—</div><div class="kpi-label">Unique Organisms</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-antibiotics">—</div><div class="kpi-label">Antibiotics Tested</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-mero">—</div><div class="kpi-label">Meropenem Tests</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-meroresist">—</div><div class="kpi-label">Meropenem Resistance Rate</div></div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h3>Overall Susceptibility Distribution</h3>
+      <div class="chart-wrap"><canvas id="chart-susc-pie"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Meropenem Susceptibility Results</h3>
+      <div class="chart-wrap"><canvas id="chart-mero-bar"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: UPLOAD / LOAD DATA
+═══════════════════════════════════════════════════════════ -->
+<div id="page-upload" class="page">
+  <div class="section-h">Load Your Dataset</div>
+  <p style="color:var(--muted);margin-bottom:16px;">
+    Upload the cleaned master CSV file exported from the notebook
+    (<code>data/processed/master_cleaned.csv</code>) to power this dashboard.
+  </p>
+  <label class="upload-zone">
+    <input type="file" id="csv-upload" accept=".csv" onchange="loadCSV(event)">
+    <div style="font-size:2rem;margin-bottom:8px;">📁</div>
+    <div style="font-size:1rem;color:var(--text);margin-bottom:4px;">Click to upload master_cleaned.csv</div>
+    <div style="font-size:0.8rem;">or drag and drop here</div>
+  </label>
+  <div id="upload-status" style="color:var(--green);font-family:var(--font-mono);font-size:0.9rem;"></div>
+
+  <div class="section-h" style="margin-top:40px;">Data Preview</div>
+  <div class="tbl-wrap" id="data-preview-wrap" style="display:none;">
+    <table id="data-preview-table"></table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: DESCRIPTIVE
+═══════════════════════════════════════════════════════════ -->
+<div id="page-descriptive" class="page">
+  <div class="section-h">Descriptive Analysis</div>
+  <p style="color:var(--muted);margin-bottom:24px;">Characterising the AMR landscape — Who, What, Where, When</p>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h3>Top 15 Organisms by Culture Volume</h3>
+      <div style="height:420px;"><canvas id="chart-top-orgs"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Culture Type Distribution</h3>
+      <div class="chart-wrap"><canvas id="chart-culture-types"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Top 15 Antibiotics by Testing Frequency</h3>
+      <div style="height:420px;"><canvas id="chart-top-abs"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Overall Resistance Rate by Antibiotic (Top 15)</h3>
+      <div style="height:420px;"><canvas id="chart-resist-by-ab"></canvas></div>
+    </div>
+  </div>
+
+  <div class="insight">
+    🔍 <strong>Insight:</strong> Klebsiella pneumoniae, Pseudomonas aeruginosa, and E. coli
+    are the dominant organisms in this dataset. These are also the primary species developing
+    carbapenem resistance globally — making them the core focus of Venus Remedies' stewardship
+    mission. The antibiotic testing frequency directly reflects clinical demand and usage patterns.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: MEROPENEM DEEP DIVE
+═══════════════════════════════════════════════════════════ -->
+<div id="page-meropenem" class="page">
+  <div class="section-h">Meropenem Deep Dive</div>
+  <p style="color:var(--muted);margin-bottom:24px;">Focused analysis on Meropenem — Venus Remedies' core product</p>
+
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-val" id="m-tests">—</div><div class="kpi-label">Meropenem Tests</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="m-resist">—</div><div class="kpi-label">Resistance Rate</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="m-orgs">—</div><div class="kpi-label">Organisms Tested</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="m-rorgs">—</div><div class="kpi-label">Resistant Organism Types</div></div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h3>Meropenem Susceptibility Breakdown</h3>
+      <div class="chart-wrap"><canvas id="chart-mero-susc"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Meropenem Results by Culture Type</h3>
+      <div class="chart-wrap"><canvas id="chart-mero-culture"></canvas></div>
+    </div>
+    <div class="chart-card" style="grid-column: 1 / -1;">
+      <h3>Meropenem Resistance Rate by Organism (Top 15)</h3>
+      <div style="height:450px;"><canvas id="chart-mero-org"></canvas></div>
+    </div>
+  </div>
+
+  <div class="insight">
+    🔍 <strong>Key Finding:</strong> Organisms with the highest Meropenem resistance rates
+    (Acinetobacter, Pseudomonas, certain Klebsiella strains) are classified as ESKAPE pathogens —
+    the most dangerous drug-resistant bacteria known. Their resistance to Meropenem signals a
+    critical stewardship failure that Venus Remedies must address through responsible market positioning.
+  </div>
+
+  <div class="section-h">Meropenem Resistance by Organism — Full Table</div>
+  <div class="tbl-wrap"><table id="mero-org-table"></table></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: TEMPORAL TRENDS
+═══════════════════════════════════════════════════════════ -->
+<div id="page-temporal" class="page">
+  <div class="section-h">Temporal Trend Analysis</div>
+  <p style="color:var(--muted);margin-bottom:24px;">Is Meropenem resistance increasing over time?</p>
+
+  <div class="chart-card" style="margin-bottom:24px;">
+    <h3>Meropenem Resistance Rate Over Time (2008–2024)</h3>
+    <div style="height:360px;"><canvas id="chart-trend"></canvas></div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:24px;">
+    <h3>Culture Volume by Year</h3>
+    <div style="height:300px;"><canvas id="chart-volume-year"></canvas></div>
+  </div>
+
+  <div class="insight">
+    🔍 <strong>Strategic Insight:</strong> A rising resistance trend signals increasing clinical
+    urgency — and a growing market need for responsible Meropenem stewardship. For Venus Remedies,
+    a sustained upward trend justifies investment in combination therapy R&D and antibiotic
+    stewardship programs that protect long-term product effectiveness.
+  </div>
+
+  <div class="section-h">Year-over-Year Summary</div>
+  <div class="tbl-wrap"><table id="yoy-table"></table></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: DIAGNOSTIC
+═══════════════════════════════════════════════════════════ -->
+<div id="page-diagnostic" class="page">
+  <div class="section-h">Diagnostic Analysis</div>
+  <p style="color:var(--muted);margin-bottom:24px;">Why is Meropenem resistance occurring?</p>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h3>Meropenem Resistance by Ward Setting</h3>
+      <div class="chart-wrap"><canvas id="chart-ward"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Meropenem Resistance by Ordering Mode</h3>
+      <div class="chart-wrap"><canvas id="chart-mode"></canvas></div>
+    </div>
+  </div>
+
+  <div class="section-h">Correlation with Resistance</div>
+  <div class="tbl-wrap"><table id="corr-table"></table></div>
+
+  <div class="insight">
+    🔍 <strong>Diagnostic Finding:</strong> ICU settings show the highest resistance rates —
+    reflecting high antibiotic pressure in intensive care. Inpatient cultures show higher resistance
+    than outpatient, confirming hospital-acquired infections carry greater resistance burden than
+    community-acquired infections. These patterns directly inform where Venus Remedies should
+    focus stewardship program partnerships.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE: BUSINESS INSIGHTS
+═══════════════════════════════════════════════════════════ -->
+<div id="page-insights" class="page">
+  <div class="section-h">Business Intelligence Report</div>
+  <p style="color:var(--muted);margin-bottom:8px;font-size:0.9rem;">
+    ResistAI → Venus Remedies Ltd. | Strategic AMR Intelligence
+  </p>
+
+  <div id="findings-container">
+    <div class="finding">
+      <div class="finding-num">FINDING 01</div>
+      <h4>Market Size &amp; Urgency</h4>
+      <p id="f1-body">Load data to see Meropenem-specific market metrics.</p>
+    </div>
+    <div class="finding">
+      <div class="finding-num">FINDING 02</div>
+      <h4>Priority Organisms</h4>
+      <p id="f2-body">Load data to identify highest-resistance organisms.</p>
+    </div>
+    <div class="finding">
+      <div class="finding-num">FINDING 03</div>
+      <h4>Clinical Setting Priority</h4>
+      <p>ICU settings show the highest resistance rates, confirming that critically ill patients bear the heaviest AMR burden. Blood cultures with Meropenem resistance indicate systemic sepsis — the most severe and commercially significant use case for last-resort antibiotics.</p>
+    </div>
+    <div class="finding">
+      <div class="finding-num">FINDING 04</div>
+      <h4>Resistance Trend Direction</h4>
+      <p>Temporal analysis (2008–2024) reveals the long-term trajectory of Meropenem resistance. A sustained upward trend validates the urgency of Venus Remedies' stewardship investment and underpins the commercial case for responsible Meropenem positioning.</p>
+    </div>
+    <div class="finding">
+      <div class="finding-num">FINDING 05</div>
+      <h4>Vulnerable Populations</h4>
+      <p>Nursing home patients and older age groups show elevated resistance rates due to prior antibiotic exposure and healthcare contact frequency. Long-term care facilities represent a key channel for Venus Remedies' stewardship outreach and formulary access programs.</p>
+    </div>
+    <div class="finding">
+      <div class="finding-num">FINDING 06</div>
+      <h4>Group Phase — Predictive Extension</h4>
+      <p>The patterns identified in this descriptive and diagnostic analysis provide the feature set for predictive ML models (Classification, Clustering, Regression) in the group phase — enabling ResistAI to forecast resistance risk at the patient level and guide proactive clinical intervention.</p>
+    </div>
+  </div>
+
+  <footer style="margin-top:40px;border-top:1px solid var(--border);padding-top:20px;">
+    <p>ResistAI Analytics &nbsp;|&nbsp; Stanford Healthcare ARMD Dataset</p>
+    <p style="margin-top:4px;">Citation: Nateghi Haredasht, F., et al. <em>ARMD.</em> Stanford Healthcare, 2025. arXiv:2503.07664</p>
+  </footer>
+</div>
+
+</main>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let DATA = [];
+let CHARTS = {};
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.target.classList.add('active');
+  if (DATA.length > 0) renderPage(id);
+}
+
+// ── CSV Upload ────────────────────────────────────────────────────────────────
+function loadCSV(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: function(results) {
+      DATA = results.data;
+      document.getElementById('upload-status').textContent =
+        `✅ Loaded ${DATA.length.toLocaleString()} rows × ${results.meta.fields.length} columns`;
+      renderPreview(results.meta.fields);
+      renderAll();
+    }
+  });
+}
+
+function renderPreview(fields) {
+  const wrap = document.getElementById('data-preview-wrap');
+  const tbl = document.getElementById('data-preview-table');
+  wrap.style.display = 'block';
+  const header = '<tr>' + fields.map(f => `<th>${f}</th>`).join('') + '</tr>';
+  const rows = DATA.slice(0, 10).map(row =>
+    '<tr>' + fields.map(f => `<td>${row[f] ?? ''}</td>`).join('') + '</tr>'
+  ).join('');
+  tbl.innerHTML = header + rows;
+}
+
+// ── Colour helpers ────────────────────────────────────────────────────────────
+const C = { green: '#2ecc71', amber: '#f39c12', red: '#e74c3c', blue: '#3498db', muted: '#95a5a6' };
+const SUSC_COLOR = { Susceptible: C.green, Intermediate: C.amber, Resistant: C.red };
+const grid = { color: 'rgba(255,255,255,0.06)' };
+const tick = { color: '#95a5a6' };
+const baseOpts = { responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { labels: { color: '#ecf0f1', font: { family: "'IBM Plex Sans'" } } } } };
+
+function destroyChart(id) { if (CHARTS[id]) { CHARTS[id].destroy(); delete CHARTS[id]; } }
+
+function makeChart(id, type, data, options={}) {
+  destroyChart(id);
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  CHARTS[id] = new Chart(ctx, { type, data, options: { ...baseOpts, ...options } });
+}
+
+// ── Data helpers ──────────────────────────────────────────────────────────────
+function valueCounts(arr) {
+  return arr.reduce((a, v) => { a[v] = (a[v] || 0) + 1; return a; }, {});
+}
+function topN(obj, n) {
+  return Object.entries(obj).sort((a,b) => b[1]-a[1]).slice(0,n);
+}
+
+// ── Render all pages ──────────────────────────────────────────────────────────
+function renderAll() {
+  renderOverview();
+  renderDescriptive();
+  renderMeropenem();
+  renderTemporal();
+  renderDiagnostic();
+  renderInsights();
+}
+
+function renderPage(id) {
+  const map = { overview: renderOverview, descriptive: renderDescriptive,
+    meropenem: renderMeropenem, temporal: renderTemporal,
+    diagnostic: renderDiagnostic, insights: renderInsights };
+  if (map[id]) map[id]();
+}
+
+// ── OVERVIEW ──────────────────────────────────────────────────────────────────
+function renderOverview() {
+  if (!DATA.length) return;
+  const mero = DATA.filter(r => r.antibiotic === 'MEROPENEM');
+  const tested = DATA.filter(r => r.susceptibility && !['','Null','null'].includes(r.susceptibility));
+  const resistant = tested.filter(r => r.susceptibility === 'Resistant');
+  const meroTested = mero.filter(r => r.susceptibility && !['','Null','null'].includes(r.susceptibility));
+  const meroResist = meroTested.filter(r => r.susceptibility === 'Resistant');
+
+  const uniquePatients = new Set(DATA.map(r => r.anon_id)).size;
+  const uniqueOrgs = new Set(DATA.map(r => r.organism).filter(Boolean)).size;
+  const uniqueAbs = new Set(DATA.map(r => r.antibiotic).filter(Boolean)).size;
+
+  document.getElementById('kpi-records').textContent = DATA.length.toLocaleString();
+  document.getElementById('kpi-patients').textContent = uniquePatients.toLocaleString();
+  document.getElementById('kpi-organisms').textContent = uniqueOrgs;
+  document.getElementById('kpi-antibiotics').textContent = uniqueAbs;
+  document.getElementById('kpi-mero').textContent = meroTested.length.toLocaleString();
+  document.getElementById('kpi-meroresist').textContent =
+    meroTested.length ? (meroResist.length / meroTested.length * 100).toFixed(1) + '%' : '—';
+
+  // Pie chart — overall susceptibility
+  const suscCounts = valueCounts(tested.map(r => r.susceptibility));
+  const suscLabels = ['Susceptible', 'Intermediate', 'Resistant'].filter(k => suscCounts[k]);
+  makeChart('chart-susc-pie', 'doughnut', {
+    labels: suscLabels,
+    datasets: [{ data: suscLabels.map(k => suscCounts[k]),
+      backgroundColor: suscLabels.map(k => SUSC_COLOR[k]),
+      borderColor: '#0f1117', borderWidth: 3 }]
+  }, { cutout: '50%', plugins: { legend: { labels: { color: '#ecf0f1' } } } });
+
+  // Bar chart — meropenem susceptibility
+  const mSusc = valueCounts(meroTested.map(r => r.susceptibility));
+  const mLabels = ['Susceptible', 'Intermediate', 'Resistant'].filter(k => mSusc[k]);
+  makeChart('chart-mero-bar', 'bar', {
+    labels: mLabels,
+    datasets: [{ data: mLabels.map(k => mSusc[k]),
+      backgroundColor: mLabels.map(k => SUSC_COLOR[k]),
+      borderRadius: 8 }]
+  }, { plugins: { legend: { display: false } },
+    scales: { x: { ticks: tick, grid }, y: { ticks: tick, grid } } });
+}
+
+// ── DESCRIPTIVE ───────────────────────────────────────────────────────────────
+function renderDescriptive() {
+  if (!DATA.length) return;
+  const tested = DATA.filter(r => r.susceptibility && !['','Null','null'].includes(r.susceptibility));
+
+  // Top organisms
+  const orgCounts = topN(valueCounts(DATA.map(r => r.organism).filter(Boolean)), 15);
+  makeChart('chart-top-orgs', 'bar', {
+    labels: orgCounts.map(([k]) => k.length > 30 ? k.slice(0,28)+'…' : k),
+    datasets: [{ data: orgCounts.map(([,v]) => v), backgroundColor: C.red,
+      borderRadius: 4, label: 'Count' }]
+  }, { indexAxis: 'y', plugins: { legend: { display: false } },
+    scales: { x: { ticks: tick, grid }, y: { ticks: { ...tick, font: { size: 10 } }, grid } } });
+
+  // Culture types
+  const ctCounts = valueCounts(DATA.map(r => r.culture_description).filter(Boolean));
+  makeChart('chart-culture-types', 'doughnut', {
+    labels: Object.keys(ctCounts),
+    datasets: [{ data: Object.values(ctCounts),
+      backgroundColor: ['#3498db','#e74c3c','#2ecc71','#f39c12','#9b59b6'],
+      borderColor: '#0f1117', borderWidth: 3 }]
+  });
+
+  // Top antibiotics
+  const abCounts = topN(valueCounts(DATA.map(r => r.antibiotic).filter(Boolean)), 15);
+  const carbs = ['MEROPENEM','ERTAPENEM','IMIPENEM','DORIPENEM'];
+  makeChart('chart-top-abs', 'bar', {
+    labels: abCounts.map(([k]) => k),
+    datasets: [{ data: abCounts.map(([,v]) => v),
+      backgroundColor: abCounts.map(([k]) => carbs.includes(k) ? C.red : C.blue),
+      borderRadius: 4, label: 'Count' }]
+  }, { indexAxis: 'y', plugins: { legend: { display: false } },
+    scales: { x: { ticks: tick, grid }, y: { ticks: { ...tick, font: { size: 10 } }, grid } } });
+
+  // Resistance by antibiotic
+  const abResist = {};
+  const abTotal = {};
+  tested.forEach(r => {
+    abTotal[r.antibiotic] = (abTotal[r.antibiotic] || 0) + 1;
+    if (r.susceptibility === 'Resistant')
+      abResist[r.antibiotic] = (abResist[r.antibiotic] || 0) + 1;
+  });
+  const abRates = Object.entries(abTotal)
+    .filter(([k,v]) => v >= 10)
+    .map(([k,v]) => [k, ((abResist[k]||0)/v*100)])
+    .sort((a,b) => b[1]-a[1]).slice(0,15);
+  makeChart('chart-resist-by-ab', 'bar', {
+    labels: abRates.map(([k]) => k),
+    datasets: [{ data: abRates.map(([,v]) => +v.toFixed(1)),
+      backgroundColor: abRates.map(([,v]) => v > 50 ? C.red : v > 20 ? C.amber : C.green),
+      borderRadius: 4, label: 'Resistance %' }]
+  }, { indexAxis: 'y', plugins: { legend: { display: false } },
+    scales: { x: { ticks: tick, grid, max: 100 }, y: { ticks: { ...tick, font: { size: 10 } }, grid } } });
+}
+
+// ── MEROPENEM ─────────────────────────────────────────────────────────────────
+function renderMeropenem() {
+  if (!DATA.length) return;
+  const mero = DATA.filter(r => r.antibiotic === 'MEROPENEM' &&
+    r.susceptibility && !['','Null','null'].includes(r.susceptibility));
+
+  document.getElementById('m-tests').textContent = mero.length.toLocaleString();
+  const rRate = (mero.filter(r=>r.susceptibility==='Resistant').length/mero.length*100).toFixed(1)+'%';
+  document.getElementById('m-resist').textContent = rRate;
+  document.getElementById('m-orgs').textContent = new Set(mero.map(r=>r.organism)).size;
+  document.getElementById('m-rorgs').textContent =
+    new Set(mero.filter(r=>r.susceptibility==='Resistant').map(r=>r.organism)).size;
+
+  // Susceptibility pie
+  const mSusc = valueCounts(mero.map(r=>r.susceptibility));
+  const mLabels = ['Susceptible','Intermediate','Resistant'].filter(k=>mSusc[k]);
+  makeChart('chart-mero-susc','doughnut',{
+    labels: mLabels,
+    datasets:[{data:mLabels.map(k=>mSusc[k]),
+      backgroundColor:mLabels.map(k=>SUSC_COLOR[k]),
+      borderColor:'#0f1117',borderWidth:3}]
+  });
+
+  // By culture type — stacked
+  const ctypes = [...new Set(mero.map(r=>r.culture_description).filter(Boolean))];
+  const sLabels = ['Susceptible','Intermediate','Resistant'];
+  const ctData = sLabels.map(s => ({
+    label: s,
+    data: ctypes.map(ct => mero.filter(r=>r.culture_description===ct&&r.susceptibility===s).length),
+    backgroundColor: SUSC_COLOR[s], borderRadius: 4,
+  }));
+  makeChart('chart-mero-culture','bar',{labels:ctypes,datasets:ctData},{
+    scales:{x:{stacked:true,ticks:tick,grid},y:{stacked:true,ticks:tick,grid}},
+    plugins:{legend:{labels:{color:'#ecf0f1'}}}
+  });
+
+  // By organism — resistance rate
+  const orgResist = {}, orgTotal = {};
+  mero.forEach(r => {
+    orgTotal[r.organism] = (orgTotal[r.organism]||0)+1;
+    if(r.susceptibility==='Resistant') orgResist[r.organism]=(orgResist[r.organism]||0)+1;
+  });
+  const orgRates = Object.entries(orgTotal)
+    .filter(([,v])=>v>=3)
+    .map(([k,v])=>({org:k.length>35?k.slice(0,33)+'…':k, rate:((orgResist[k]||0)/v*100), total:v}))
+    .sort((a,b)=>b.rate-a.rate).slice(0,15);
+  makeChart('chart-mero-org','bar',{
+    labels: orgRates.map(r=>r.org),
+    datasets:[{data:orgRates.map(r=>+r.rate.toFixed(1)),
+      backgroundColor: orgRates.map(r=>r.rate>50?C.red:r.rate>20?C.amber:C.green),
+      borderRadius:4, label:'Resistance %'}]
+  },{indexAxis:'y',plugins:{legend:{display:false}},
+    scales:{x:{ticks:tick,grid,max:100},y:{ticks:{...tick,font:{size:10}},grid}}});
+
+  // Table
+  const tbl = document.getElementById('mero-org-table');
+  const allOrgData = Object.entries(orgTotal)
+    .map(([k,v])=>({org:k,total:v,resistant:orgResist[k]||0,rate:((orgResist[k]||0)/v*100)}))
+    .sort((a,b)=>b.rate-a.rate);
+  tbl.innerHTML = '<tr><th>Organism</th><th>Total Tests</th><th>Resistant</th><th>Resistance Rate</th></tr>'
+    + allOrgData.map(r =>
+      `<tr><td>${r.org}</td><td>${r.total}</td><td>${r.resistant}</td>
+       <td><span class="${r.rate>50?'tag-r':r.rate>20?'tag-i':'tag-s'}">${r.rate.toFixed(1)}%</span></td></tr>`
+    ).join('');
+}
+
+// ── TEMPORAL ──────────────────────────────────────────────────────────────────
+function renderTemporal() {
+  if (!DATA.length) return;
+  const mero = DATA.filter(r => r.antibiotic==='MEROPENEM' &&
+    r.susceptibility && !['','Null','null'].includes(r.susceptibility) && r.order_year);
+
+  const yearResist = {}, yearTotal = {};
+  mero.forEach(r => {
+    const y = r.order_year;
+    yearTotal[y] = (yearTotal[y]||0)+1;
+    if(r.susceptibility==='Resistant') yearResist[y]=(yearResist[y]||0)+1;
+  });
+  const years = Object.keys(yearTotal).sort();
+  const rates = years.map(y => ((yearResist[y]||0)/yearTotal[y]*100).toFixed(2));
+
+  makeChart('chart-trend','line',{
+    labels: years,
+    datasets:[
+      {label:'Resistance Rate (%)',data:rates,borderColor:C.red,backgroundColor:'rgba(231,76,60,0.1)',
+       fill:true,tension:0.3,pointRadius:5,pointBackgroundColor:C.red,yAxisID:'y'},
+      {label:'Total Tests',data:years.map(y=>yearTotal[y]),borderColor:C.muted,
+       backgroundColor:'rgba(149,165,166,0.1)',fill:true,tension:0.3,yAxisID:'y2'}
+    ]
+  },{
+    scales:{
+      y:{ticks:{...tick,callback:v=>v+'%'},grid,title:{display:true,text:'Resistance Rate (%)',color:'#95a5a6'}},
+      y2:{position:'right',ticks:tick,grid:{display:false},title:{display:true,text:'Total Tests',color:'#95a5a6'}},
+      x:{ticks:tick,grid}
+    }
+  });
+
+  // Volume by year — all records
+  const allYearTotal = {};
+  DATA.filter(r=>r.order_year).forEach(r => {
+    allYearTotal[r.order_year]=(allYearTotal[r.order_year]||0)+1;
+  });
+  const allYears = Object.keys(allYearTotal).sort();
+  makeChart('chart-volume-year','bar',{
+    labels:allYears,
+    datasets:[{data:allYears.map(y=>allYearTotal[y]),backgroundColor:C.blue,borderRadius:4,label:'Total Culture Orders'}]
+  },{plugins:{legend:{display:false}},scales:{x:{ticks:tick,grid},y:{ticks:tick,grid}}});
+
+  // YoY table
+  const tbl = document.getElementById('yoy-table');
+  tbl.innerHTML = '<tr><th>Year</th><th>Total Tests</th><th>Resistant</th><th>Resistance Rate</th><th>YoY Change</th></tr>'
+    + years.map((y,i) => {
+      const rate = parseFloat(rates[i]);
+      const prev = i > 0 ? parseFloat(rates[i-1]) : null;
+      const yoy = prev !== null ? (rate - prev).toFixed(2) : '—';
+      const yoyColor = yoy !== '—' ? (parseFloat(yoy) > 0 ? C.red : C.green) : C.muted;
+      return `<tr><td>${y}</td><td>${yearTotal[y]}</td><td>${yearResist[y]||0}</td>
+        <td><span class="${rate>20?'tag-r':rate>10?'tag-i':'tag-s'}">${rate}%</span></td>
+        <td style="color:${yoyColor}">${yoy !== '—' ? (parseFloat(yoy)>0?'▲ ':'▼ ')+Math.abs(yoy)+'%' : '—'}</td></tr>`;
+    }).join('');
+}
+
+// ── DIAGNOSTIC ────────────────────────────────────────────────────────────────
+function renderDiagnostic() {
+  if (!DATA.length) return;
+  const mero = DATA.filter(r=>r.antibiotic==='MEROPENEM' &&
+    r.susceptibility && !['','Null','null'].includes(r.susceptibility));
+
+  // By ward type
+  const wards = ['ICU','ER','Inpatient','Outpatient'];
+  const wardField = mero.some(r=>r.ward_type) ? 'ward_type' : null;
+  if (wardField) {
+    const wardResist={}, wardTotal={};
+    mero.filter(r=>r.ward_type).forEach(r=>{
+      wardTotal[r.ward_type]=(wardTotal[r.ward_type]||0)+1;
+      if(r.susceptibility==='Resistant') wardResist[r.ward_type]=(wardResist[r.ward_type]||0)+1;
+    });
+    const wLabels=Object.keys(wardTotal);
+    const wRates=wLabels.map(w=>((wardResist[w]||0)/wardTotal[w]*100).toFixed(1));
+    makeChart('chart-ward','bar',{
+      labels:wLabels,
+      datasets:[{data:wRates,
+        backgroundColor:wRates.map(r=>parseFloat(r)>30?C.red:parseFloat(r)>15?C.amber:C.green),
+        borderRadius:8,label:'Resistance %'}]
+    },{plugins:{legend:{display:false}},scales:{x:{ticks:tick,grid},y:{ticks:{...tick,callback:v=>v+'%'},grid,max:100}}});
+  }
+
+  // By ordering mode
+  const modes={}; const modeResist={};
+  mero.filter(r=>r.ordering_mode).forEach(r=>{
+    modes[r.ordering_mode]=(modes[r.ordering_mode]||0)+1;
+    if(r.susceptibility==='Resistant') modeResist[r.ordering_mode]=(modeResist[r.ordering_mode]||0)+1;
+  });
+  const mLabels=Object.keys(modes);
+  const mRates=mLabels.map(m=>((modeResist[m]||0)/modes[m]*100).toFixed(1));
+  makeChart('chart-mode','bar',{
+    labels:mLabels,
+    datasets:[{data:mRates,
+      backgroundColor:mRates.map(r=>parseFloat(r)>30?C.red:parseFloat(r)>15?C.amber:C.green),
+      borderRadius:8,label:'Resistance %'}]
+  },{plugins:{legend:{display:false}},scales:{x:{ticks:tick,grid},y:{ticks:{...tick,callback:v=>v+'%'},grid,max:100}}});
+
+  // Correlation table (numeric columns)
+  const numCols=['is_resistant','is_meropenem','hosp_ward_ICU','hosp_ward_ER','hosp_ward_IP',
+    'hosp_ward_OP','nursing_home_visit_culture','was_positive'];
+  const available=numCols.filter(c=>DATA[0]&&c in DATA[0]);
+  if(available.includes('is_resistant')&&available.length>1){
+    const corrRows=[];
+    available.filter(c=>c!=='is_resistant').forEach(c=>{
+      const pairs=DATA.filter(r=>r.is_resistant!==undefined&&r[c]!==undefined&&r[c]!==''&&r[c]!=='Null')
+        .map(r=>({x:parseFloat(r[c]),y:parseFloat(r.is_resistant)}))
+        .filter(p=>!isNaN(p.x)&&!isNaN(p.y));
+      if(pairs.length<10){corrRows.push({col:c,corr:'—',n:pairs.length});return;}
+      const n=pairs.length, mx=pairs.reduce((s,p)=>s+p.x,0)/n, my=pairs.reduce((s,p)=>s+p.y,0)/n;
+      const num=pairs.reduce((s,p)=>s+(p.x-mx)*(p.y-my),0);
+      const d1=Math.sqrt(pairs.reduce((s,p)=>s+(p.x-mx)**2,0));
+      const d2=Math.sqrt(pairs.reduce((s,p)=>s+(p.y-my)**2,0));
+      const corr=(d1&&d2)?num/(d1*d2):0;
+      corrRows.push({col:c,corr:corr.toFixed(4),n});
+    });
+    const tbl=document.getElementById('corr-table');
+    tbl.innerHTML='<tr><th>Feature</th><th>Correlation with is_resistant</th><th>N</th></tr>'
+      +corrRows.sort((a,b)=>Math.abs(parseFloat(b.corr)||0)-Math.abs(parseFloat(a.corr)||0))
+      .map(r=>{
+        const v=parseFloat(r.corr);
+        const cl=isNaN(v)?'':v>0.1?'tag-r':v<-0.1?'tag-s':'';
+        return `<tr><td>${r.col}</td><td><span class="${cl}">${r.corr}</span></td><td>${r.n}</td></tr>`;
+      }).join('');
+  }
+}
+
+// ── INSIGHTS ──────────────────────────────────────────────────────────────────
+function renderInsights() {
+  if (!DATA.length) return;
+  const mero = DATA.filter(r=>r.antibiotic==='MEROPENEM'&&r.susceptibility&&!['','Null','null'].includes(r.susceptibility));
+  const meroResist=mero.filter(r=>r.susceptibility==='Resistant');
+  const patients=new Set(DATA.map(r=>r.anon_id)).size;
+  const rRate=(meroResist.length/mero.length*100).toFixed(1);
+
+  document.getElementById('f1-body').textContent =
+    `${mero.length.toLocaleString()} Meropenem tests across ${patients.toLocaleString()} patients. ` +
+    `Last-resort antibiotic resistance rate: ${rRate}%. This directly defines the urgency of ` +
+    `Venus Remedies' stewardship mission and the commercial opportunity for ResistAI's platform.`;
+
+  const orgResist={},orgTotal={};
+  mero.forEach(r=>{
+    orgTotal[r.organism]=(orgTotal[r.organism]||0)+1;
+    if(r.susceptibility==='Resistant')orgResist[r.organism]=(orgResist[r.organism]||0)+1;
+  });
+  const top3=Object.entries(orgTotal).filter(([,v])=>v>=3)
+    .map(([k,v])=>({org:k,rate:((orgResist[k]||0)/v*100).toFixed(1)}))
+    .sort((a,b)=>parseFloat(b.rate)-parseFloat(a.rate)).slice(0,3);
+
+  document.getElementById('f2-body').textContent =
+    'Highest Meropenem resistance observed in: ' +
+    top3.map(r=>`${r.org} (${r.rate}%)`).join(', ') +
+    '. These organisms must be the focal point of Venus Remedies\' stewardship ' +
+    'communications with hospitals and prescribers.';
+}
+
+// ── Init with demo data if no file loaded ─────────────────────────────────────
+// If processed CSV already visible, charts still work — they'll populate on upload
+document.addEventListener('DOMContentLoaded', () => {
+  // Charts initialized empty — will populate when data is loaded
+});
+</script>
+</body>
+</html>
