@@ -145,7 +145,7 @@ def get_data():
     Load master dataset. Tries processed CSV first (faster),
     falls back to raw files if not available.
     """
-    processed_path = ROOT / "data" / "processed" / "master_cleaned.csv"
+    processed_path = ROOT / "data" / "processed" / "master_cleaned_sample.csv"
 
     if processed_path.exists():
         df = pd.read_csv(processed_path, low_memory=False)
