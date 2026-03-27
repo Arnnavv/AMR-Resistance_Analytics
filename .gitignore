@@ -208,3 +208,7 @@ __marimo__/
 
 
 amr_venv/
+
+data/raw/
+data/processed/*
+!data/processed/master_cleaned.csv
